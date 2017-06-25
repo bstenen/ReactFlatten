@@ -1,8 +1,17 @@
 import React, { Component } from 'react';
 import './App.css';
+import NumericInput from 'react-numeric-input';
+import Button from 'react-bootstrap/lib/Button';
+import Jumbotron from 'react-bootstrap/lib/Jumbotron';
+import { PageHeader } from 'react-bootstrap';
+import { Popover } from 'react-bootstrap';
+import { OverlayTrigger } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
+import { Well } from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
 
-
-var array = [ [1,[2,5],[3]], 4];
+var array = [ [1, 2,[3]], 4];
 
 var resultArray = [];
 
@@ -75,19 +84,30 @@ function displayNestedArray() {
 function displayFlattenedArray()
 {
 	return (
-		<div className="arrayData">{getFlattenedArrayString(array)}</div>
+		<div >{getFlattenedArrayString(array)}</div>
 	);
 }
 
 
-
+const flattenPopover = (
+	<Popover id="popover-trigger-hover-focus">
+		<strong> Flatten the current array and show the result </strong>
+	</Popover>
+);
+const generatePopover = (
+	<Popover id="popover-trigger-hover-focus">
+		<strong> Generate a new array with  &lt;Potential array depth&gt; nested arrays </strong>
+	</Popover>
+);
 
 class App extends Component {
 	
-	constructor() {
+	constructor(props) {
+		console.log(props);
 		super();
 		this.state = {
-			showResult: false
+			showResult: false,
+			depth: 10,
 		}
 	}
 	
@@ -111,19 +131,72 @@ class App extends Component {
 	
 	
 	makeNewArray(e) {
-		e.preventDefault();
 		num=0;
-		array = this.makeNestedArray(30);
+		array = this.makeNestedArray(this.state.depth);
 		this.setState({showResult: false})
 	}
 	
-	onClick(e) {
-		e.preventDefault();
+	onFlattenClick(e) {
 		this.setState({showResult: !this.state.showResult})
 	}
+	
 
+	handleDepthChange(e) {
+		this.setState({depth: e})
+	}
+	
 	render() {
 		return (
+		<div>
+		
+			<Jumbotron>
+				<h1>Flatten dimensional arrays</h1>
+				<p> A simple ReactJS app to generate, display, and flatten multidimensional arrays.</p>
+			</Jumbotron>
+			
+			<Row className="smallerRow">
+			<Col xs={6} md={3}>
+			
+			<Panel bsStyle="primary" header="Potential array depth">
+				<NumericInput 
+					name="depthInput"
+					onChange={this.handleDepthChange.bind(this)}
+					className="form-control" 
+					value={ this.state.depth } 
+					min={ 1 } 
+					max={ 30 } 
+					step={ 1 } 
+					precision={ 0 } 
+					size={ 5 } 
+					mobile
+				/>
+			</Panel>
+			</Col>
+			<Col xs={6} md={9}>
+				<Well>
+					<span className="nestedArrayContainer"> {displayNestedArray()} </span>
+				<OverlayTrigger trigger={['hover','focus']} placement="top" overlay={generatePopover}>
+					<Button className="buttonGenerate" onClick={this.makeNewArray.bind(this)} bsStyle="primary">Generate Array</Button>
+				</OverlayTrigger>
+				</Well>
+			</Col>
+			</Row>
+			<Row className="smallerRow">
+			<Col xs={12} md={12}>
+				<OverlayTrigger trigger={['hover','focus']} placement="right" overlay={flattenPopover}>
+					<Button className="buttonFlatten" onClick={this.onFlattenClick.bind(this)} bsStyle="primary">Flatten Array</Button>
+				</OverlayTrigger>
+				<Panel collapsible expanded={this.state.showResult}>
+					{displayFlattenedArray()}
+				</Panel>
+			</Col>
+			</Row>
+		
+		
+		
+		</div>
+		
+		/*
 			<div> 
 				<div className="header">
 					<h1>Flatten multidimensional arrays</h1>
@@ -147,6 +220,7 @@ class App extends Component {
 					</div>
 				</div>
 			</div>
+		*/
 		);
 	}
 }
